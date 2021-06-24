@@ -22,7 +22,7 @@ module.exports = app => {
             const userFromDB = await app.db('users')
                 .where({ email: user.email }).first()
 
-            if(!user.id){
+            if (!user.id) {
                 notExistsOrError(userFromDB, 'Usuario ja cadastrado')
             }
 
@@ -33,13 +33,13 @@ module.exports = app => {
         user.password = encryptPassword(user.password)
         delete user.confirmPassword
 
-        if(user.id){
+        if (user.id) {
             app.db('users')
                 .update(user)
-                .where({id: user.id})
+                .where({ id: user.id })
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
-        }else {
+        } else {
             app.db('users')
                 .insert(user)
                 .then(_ => res.status(204).send())
@@ -55,6 +55,15 @@ module.exports = app => {
             .catch(err => res.status(500).send(err))
     }
 
-    return { save, get }
+    const getById = (req, res) => {
+        app.db('users')
+            .select('id', 'name', 'email', 'admin')
+            .where({id: req.params.id})
+            .first()
+            .then(users => res.json(users))
+            .catch(err => res.status(500).send(err))
+    }
+
+    return { save, get, getById }
 
 }
