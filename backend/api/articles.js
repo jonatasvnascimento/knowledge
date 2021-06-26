@@ -34,7 +34,11 @@ module.exports = app => {
         try {
             const rowsDeleted = await app.db('articles')
                 .where({ id: req.params.id }).del()
-            existsOrError(rowsDeleted, 'Artigos não encontrado')
+            try {
+                existsOrError(rowsDeleted, 'Artigos não encontrado')
+            } catch (msg) {
+                res.status(400).send(msg)
+            }
 
             res.status(204).send()
         } catch (msg) {
